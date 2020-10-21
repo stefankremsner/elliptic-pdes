@@ -1,5 +1,15 @@
 # Solve elliptic PDEs with Machine learning
 
+examples include
+
+```
+NonequidistantTimestepsInsurance
+NonequidistantLaplaceOnSmallerBall
+NonequidistantQuadraticZ
+```
+
+can be set in .env file for a default value
+
 ## Run
 
 For a single point run the following
