@@ -10,7 +10,7 @@ def readFromCmdLine(cfg, args=sys.argv[1:]):
     parser.add_argument("-N", "--num_time_interval", type=int, help="Number of time steps.")
     parser.add_argument("-T", "--total_time", type=float, help="Final time T.")
     parser.add_argument("-BS", "--batch_size", type=int, help="Batch size.")
-    parser.add_argument("-VS", "--valid_size", type=int, help="Validation size.")
+    parser.add_argument("-VS", "--validation_size", type=int, help="Validation size.")
     parser.add_argument("-I", "--num_iterations", type=int, help="Number of iterations.")
     options = parser.parse_args(args)
 
@@ -25,77 +25,103 @@ def readFromCmdLine(cfg, args=sys.argv[1:]):
 
 class Config(object):
     batch_size = 128
-    valid_size = 256
+    validation_size = 256
+    #validation_size = 64
+    #batch_size = 64
     num_time_interval = 200
-    num_iterations = 500
+    num_iterations = 200
+    #logging_frequency = 100
     logging_frequency = 10
     verbose = True
     y_init_range = [0, 1]
+    z_init_range = [-.1, .1]
 
 class LaplaceOnBallConfig(Config):
-    dim = 100
+    dim = 2
     y_init_range = [0, 1.5]
     num_hiddens = [dim, dim]
-    num_iterations = 100
+    num_iterations = 200
 
     # d = 2
     total_time = 5
-    num_time_interval = 500
-    valid_size = 64
+    num_time_interval = 100
+    validation_size = 64
     batch_size = 256
 
-    # comment out for dim = 2
+    '''
     # d = 100
     total_time = 0.01
-    num_time_interval = 100
+    num_time_interval = 200
     batch_size = 64
-    valid_size = 256
-
+    validation_size = 256
+    '''
 
 class LaplaceOnSmallerBallConfig(LaplaceOnBallConfig):
     # d = 2
-    total_time = 1
+    total_time = 0.5
     y_init_range = [0, 1]
 
-    # comment out for dim = 2
+    '''
     # d = 100
     total_time = 0.005
     y_init_range = [0, 0.005]
-    
+    '''
 
-class AdaptiveLaplaceOnSmallerBallConfig(LaplaceOnSmallerBallConfig):
-    pass
+class NonequidistantLaplaceOnSmallerBallConfig(LaplaceOnSmallerBallConfig):
+    num_time_interval = 500
+
+    '''
+    dim = 100
+    num_time_interval = 50
+    '''
 
 class InsuranceConfig(Config):
-    # d = 2 and d = 100
+    dim = 2
+    # d = 2 
+    # d = 100
+    ## FUNCTIONING
     total_time = 5
-    num_time_interval = 100
-    dim = 100
-    num_iterations = 300
-    num_hiddens = [dim, 1]
-    y_init_range = [0, 0.5]
+    #num_time_interval = 100
+    #num_iterations = 200
+    num_hiddens = [dim, dim, 1]
+    y_init_range = [1, 3]
+    z_init_range = [1, 3]
     batch_size = 64
-    valid_size = 128
+    validation_size = 256
+    #z_init_range = [0.1, 2]
+    #z_init_range = [0.01, 0.5]
 
-class AdaptiveTimestepsInsuranceConfig(InsuranceConfig):
+    # d = 2
+    num_time_interval = 200
+    num_iterations = 500
+
+    '''
+    # d = 100
+    num_time_interval = 50
+    num_iterations = 500
+    '''
+
+class NonequidistantTimestepsInsuranceConfig(InsuranceConfig):
     pass
 
-class AdaptiveQuadraticZConfig(LaplaceOnSmallerBallConfig):
-    dim = 100
+class NonequidistantQuadraticZConfig(LaplaceOnSmallerBallConfig):
+    dim = 2
     num_hiddens = [dim, dim]
-    valid_size = 256
     batch_size = 64
+    validation_size = 256
     y_init_range = [-1, 0]
-    num_iterations = 300
+    #num_iterations = 300
+    num_iterations = 500
 
     # d = 2
     total_time = 5
-    num_time_interval = 500
+    #num_time_interval = 100
 
-    # comment out for dim = 2
+    '''
     # d = 100
     total_time = 0.1
-    num_time_interval = 50
+    #num_time_interval = 50
+    '''
 
 def get_config_no_args(name):
     try:

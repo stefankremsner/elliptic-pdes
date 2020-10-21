@@ -1,9 +1,10 @@
 import multiprocessing as mp
+import torch
 import time
+import dotenv
 import sys, os
 import numpy as np
 import train
-import torch
 
 from config import get_config
 from equation import get_equation
@@ -30,33 +31,40 @@ if __name__ == '__main__':
     print('Start')
     print('---')
 
-    eq = 'AdaptiveTimestepsInsurance'
+    dotenv.load_dotenv()
+
+    eq = os.getenv('example')
+    print('solve ', eq)
+    print('---')
+
+    cfg, eq = get_config(eq)
 
     min = 0
     max = 4
     amount = 15
     linspace = np.linspace(min, max, amount)
-    pi = 1
+    pi = 0.5
 
-    cfg, eq = get_config(eq)
+    if cfg.dim == 100:
+        pi = 0.01
 
     points = [
         [p, *np.repeat(pi, cfg.dim-1)] for p in linspace
     ]
 
-    if eq.startswith('Laplace') or eq.startswith('AdaptiveLaplace'):
+    if eq.startswith('Laplace') or eq.startswith('NonequidistantLaplace'):
         X_init = np.repeat(0, cfg.dim)
         min = -.5
         max = .5
         if cfg.dim == 100:
-            min = -.1
-            max = .1
+            min = -.05
+            max = .05
 
         linspace = np.linspace(min, max, amount)
         points = [
             np.repeat(p, cfg.dim) for p in linspace
         ]
-    elif eq.startswith('AdaptiveQuadraticZ'):
+    elif eq.startswith('NonequidistantQuadraticZ'):
         X_init = np.repeat(0, cfg.dim)
         min = -1
         max = 1
@@ -73,18 +81,14 @@ if __name__ == '__main__':
 
     show_plot = False
     debug_no_z = False
-
-    # change if CUDA is avaiable
     use_cuda = False
 
     compute_parallel = True
 
-    # set to a value > 0 to have space CPU available
-    spare_processes = 0
+    spare_processes = 1
     print('spare_processes', spare_processes)
 
-    # if the Z value is not used in the driver f
-    if eq.startswith('Laplace') or eq.startswith('AdaptiveLaplace'):
+    if eq.startswith('Laplace') or eq.startswith('NonequidistantLaplace'):
         debug_no_z = True
 
     args = [eq, cfg, debug_no_z, show_plot, use_cuda]
@@ -119,3 +123,7 @@ if __name__ == '__main__':
     print('device', device)
     duration_rel = duration/len(points)
     print('final time on {:s}: {:f}, per point: {:f}'.format(str(device), duration, duration_rel))
+
+    if debug_no_z:
+        print('DEBUG')
+        print('no Z')
